@@ -129,7 +129,10 @@ app.post(POST_PATH, async (req, res) => {
             // text: bodyContent.trim()
         };
 
-        await transporter.sendMail(mailOptions);
+        const info = await transporter.sendMail(mailOptions);
+        // Add transparency logging to make issues visible
+        console.log(`Message Sent:
+            ${info}`)
 
         return res.status(200).json({
             message: 'Email sent successfully'
