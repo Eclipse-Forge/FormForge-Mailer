@@ -26,8 +26,10 @@ const SMTP_CONFIG = {
     socketTimeout: parseInt(process.env.SOCKET_TIMEOUT)
 };
 
-const SMTP_FROM = process.env.SMTP_FROM || 'noreply@example.com';
+const SMTP_FROM = process.env.SMTP_FROM;
 const DESTINATION = process.env.EMAIL_DESTINATION;
+
+const debug = process.env.DEBUG || false;
 
 // Validate required configuration
 if (
@@ -63,6 +65,11 @@ app.use(express.json({
     limit: '25kb'
 }));
 
+app.use(express.urlencoded({
+    extended: true,
+    limit: '25kb'
+}));
+
 app.use(POST_PATH, limiter);
 
 // SMTP transport
@@ -79,6 +86,12 @@ const escapeHtml = (value) => String(value)
 
 // Contact form endpoint
 app.post(POST_PATH, async (req, res) => {
+    // Debug Mode
+    if (debug) {
+        console.log(`Headers: ${req.headers}
+            Body: ${req.body}`);
+    }
+
     // Honeypot field
     if (req.body.sec) {
         return res.sendStatus(403);
