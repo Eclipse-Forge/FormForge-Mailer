@@ -1,8 +1,8 @@
 // App Setup
-import express from 'express';
-import nodemailer from 'nodemailer';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
+import express from `express`;
+import nodemailer from `nodemailer`;
+import cors from `cors`;
+import rateLimit from `express-rate-limit`;
 
 const app = express();
 
@@ -15,8 +15,8 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN;
 
 const SMTP_CONFIG = {
     host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_SECURE === 'true',
+    port: parseInt(process.env.SMTP_PORT || `587`, 10),
+    secure: process.env.SMTP_SECURE === `true`,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -29,7 +29,7 @@ const SMTP_CONFIG = {
 const SMTP_FROM = process.env.SMTP_FROM;
 const DESTINATION = process.env.EMAIL_DESTINATION;
 
-const debug = process.env.DEBUG || false;
+const debug = process.env.DEBUG === `true`;
 
 // Validate required configuration
 if (
@@ -41,7 +41,7 @@ if (
     !POST_PATH
 ) {
     console.error(
-        'Missing required environment variables. Check: EMAIL_DESTINATION, SMTP_HOST, SMTP_USER, SMTP_PASS, CORS_ORIGIN, POST_PATH'
+        `Missing required environment variables. Check: EMAIL_DESTINATION, SMTP_HOST, SMTP_USER, SMTP_PASS, CORS_ORIGIN, POST_PATH`
     );
     process.exit(1);
 }
@@ -62,12 +62,12 @@ app.use(cors({
 }));
 
 app.use(express.json({
-    limit: '25kb'
+    limit: `25kb`
 }));
 
 app.use(express.urlencoded({
     extended: true,
-    limit: '25kb'
+    limit: `25kb`
 }));
 
 app.use(POST_PATH, limiter);
@@ -88,8 +88,8 @@ const escapeHtml = (value) => String(value)
 app.post(POST_PATH, async (req, res) => {
     // Debug Mode
     if (debug) {
-        console.log(`Headers: ${req.headers}
-            Body: ${req.body}`);
+        console.log(`Headers: ${JSON.stringify(req.headers, null, 2)}
+            Body: ${JSON.stringify(req.body)}`);
     }
 
     // Honeypot field
@@ -145,7 +145,7 @@ app.post(POST_PATH, async (req, res) => {
         const info = await transporter.sendMail(mailOptions);
         // Add transparency logging to make issues visible
         console.log(`Message Sent:
-            ${info}`)
+            ${JSON.stringify(info)}`)
 
         return res.status(200).json({
             message: 'Email sent successfully'
